@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="cities">
+        <item>Kampala</item>
+        <item>Arua</item>
+        <item>Masaka</item>
+        <item>Mbale</item>
+        <item>Kabale</item>
+        <item>Gulu</item>
+        <item>Lira</item>
+        <item>FortPortal</item>
+    </string-array>
+</resources>

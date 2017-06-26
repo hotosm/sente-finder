@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="fsproviders">
+        <item>Bank</item>
+        <item>Mobile Money Agent</item>
+        <item>ATM</item>
+        <item>Micro Finance Institute</item>
+        <item>Credit Union</item>
+    </string-array>
+</resources>

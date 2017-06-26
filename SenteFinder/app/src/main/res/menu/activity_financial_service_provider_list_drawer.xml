@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="">
+        <menu>
+            <item
+                android:id="@+id/nav_home"
+                android:icon="@drawable/ic_menu_home"
+                android:title="@string/home" />
+        </menu>
+
+    </item>
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_borrow"
+            android:icon="@drawable/ic_menu_borrow"
+            android:title="@string/borrow" />
+        <item
+            android:id="@+id/nav_save"
+            android:icon="@drawable/ic_menu_save"
+            android:title="@string/save" />
+        <item
+            android:id="@+id/nav_send"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/send" />
+        <item
+            android:id="@+id/nav_withdraw"
+            android:icon="@drawable/ic_menu_withdraw"
+            android:title="@string/withdraw" />
+    </group>
+
+    <item android:title="Other">
+        <menu>
+            <item
+                android:id="@+id/nav_about_us"
+                android:title="@string/nav_about_us" />
+        </menu>
+    </item>
+
+</menu>

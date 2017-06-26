@@ -1,0 +1,239 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hot.sentefinder.fragments.WithdrawMoneyFSPFragment">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <RelativeLayout
+        android:id="@+id/fsp_map_and_detail_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/map">
+
+            <RelativeLayout
+                android:id="@+id/fsp_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="10dp"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="10dp">
+
+                <RelativeLayout
+                    android:id="@+id/fsp_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/fsp_name_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="30sp"
+                        app:layout_widthPercent="60%" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/fsp_distance_and_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fsp_name"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/fsp_walking_man"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/ic_action_walking_man" />
+
+                    <TextView
+                        android:id="@+id/fsp_dist_from_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/fsp_walking_man"
+                        android:layout_toRightOf="@+id/fsp_walking_man"
+                        android:paddingTop="3dp" />
+
+                    <TextView
+                        android:id="@+id/comma"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/fsp_dist_from_user"
+                        android:layout_toRightOf="@+id/fsp_dist_from_user"
+                        android:paddingEnd="3dp"
+                        android:paddingRight="3dp"
+                        android:paddingTop="3dp"
+                        android:text="@string/comma" />
+
+                    <TextView
+                        android:id="@+id/fsp_time_from_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/comma"
+                        android:layout_toRightOf="@+id/comma"
+                        android:paddingTop="3dp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/fsp_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fsp_distance_and_time"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/fsp_location_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_action_location"
+                        app:backgroundTint="@color/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/fsp_location_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/fsp_location_icon"
+                        android:layout_toRightOf="@+id/fsp_location_icon"
+                        android:paddingLeft="30dp"
+                        android:paddingStart="30dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/fsp_opening_hours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fsp_location"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/fsp_clock_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_action_clock"
+                        app:backgroundTint="@color/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/fsp_opening_hours_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/fsp_clock_icon"
+                        android:layout_toRightOf="@+id/fsp_clock_icon"
+                        android:paddingLeft="30dp"
+                        android:paddingStart="30dp"
+                        android:text="@string/opening_hours" />
+
+                    <TextView
+                        android:id="@+id/fsp_opening_hours_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/fsp_opening_hours_label"
+                        android:layout_toEndOf="@+id/fsp_clock_icon"
+                        android:layout_toRightOf="@+id/fsp_clock_icon"
+                        android:paddingLeft="30dp"
+                        android:paddingStart="30dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/fsp_telephone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fsp_opening_hours"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/fsp_phone_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_action_phone"
+                        app:backgroundTint="@color/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/fsp_phone_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/fsp_phone_icon"
+                        android:layout_toRightOf="@+id/fsp_phone_icon"
+                        android:autoLink="phone"
+                        android:paddingLeft="30dp"
+                        android:paddingStart="30dp"
+                        android:textColorLink="@color/colorGrey" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/fsp_additional_information"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fsp_telephone"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/fsp_additional_information_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/additional_information"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/fsp_additional_information_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/fsp_additional_information_label" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/fsp_review"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/fsp_additional_information"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/fsp_review_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        android:clickable="true"
+                        android:text="@string/review"
+                        android:textColor="@color/colorWhite" />
+
+                </RelativeLayout>
+            </RelativeLayout>
+
+        </ScrollView>
+    </RelativeLayout>
+
+</FrameLayout>

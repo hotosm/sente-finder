@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">Sente Finder</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!--action bar items for fsp list activity-->
+    <string name="action_search">search</string>
+    <string name="action_map_toggle">view map</string>
+    <string name="action_list_toggle">view list</string>
+
+    <!--nav drawer menu items-->
+    <string name="home">Home</string>
+    <string name="borrow">Borrow</string>
+    <string name="save">Save</string>
+    <string name="send">Send</string>
+    <string name="withdraw">Withdraw</string>
+    <string name="nav_about_us">About Us</string>
+
+    <string name="main_search_hint">Search service provider…</string>
+
+    <!--detail section-->
+    <string name="opening_hours">Opening hours</string>
+    <string name="additional_information">Additional information</string>
+    <string name="last_updated">Last updated:</string>
+    <string name="review">Review</string>
+    <string name="comma">,</string>
+
+    <!--review activity-->
+    <string name="review_question">How accurate was the information on this financial service provider?</string>
+    <string name="comments">Comments</string>
+    <string name="review_submit">submit review</string>
+
+    <!--about us activity-->
+    <string name="title_activity_about">About Us</string>
+    <string name="app_info">The icons in this app are from</string>
+    <string name="icon8"><a href="http://icons8.com">ICONS8</a></string>
+
+    <!--search activity-->
+    <string name="search_cities_hint">Search cities…</string>
+    <string name="search_fsps_hint">Search service providers…</string>
+
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string-array name="nav_item_activity_titles">
+        <item>Home</item>
+        <item>Borrow</item>
+        <item>Save</item>
+        <item>Send</item>
+        <item>Withdraw</item>
+    </string-array>
+
+    //application preference
+    <string name="application_preference">com.hot.sentefinder</string>
+    <string name="first_load">first load</string>
+
+</resources>
