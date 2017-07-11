@@ -21,6 +21,16 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <ProgressBar
+        android:id="@+id/review_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="49dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,9 +57,19 @@
                 android:id="@+id/fsp_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/question"
                 android:progressTint="@color/colorAccent"
-                android:stepSize="1" />
+                android:stepSize="1"
+                android:layout_below="@+id/question"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/fsp_review_meaning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fsp_rating"
+                android:text="@string/baseReview"
+                android:textAlignment="center" />
+
 
         </RelativeLayout>
 
@@ -63,7 +83,7 @@
 
             <TextView
                 android:id="@+id/fsp_comment_label"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/comments" />
 

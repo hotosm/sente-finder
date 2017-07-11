@@ -126,6 +126,7 @@ public class SendMoneyFSPFragment extends Fragment {
                 swipeRefreshLayout.setVisibility(View.INVISIBLE);
 
                 fragmentService.updateTextViewsWithFSPDetails(fsp);
+                fragmentService.deflateAllFspMarkers();
                 fragmentService.inflateFspMarker(fsp);
                 fragmentService.toggleMapHeight(fsp);
             }
@@ -143,23 +144,28 @@ public class SendMoneyFSPFragment extends Fragment {
             }
         });
 
-        if(applicationPreference.readFirstLoadPreference()){
+        if (applicationPreference.readFirstLoadPreference()) {
             getSendFinancialServiceProviders();
-        }else{
+        } else {
             List<FinancialServiceProvider> cachedFSPs = fragmentService.getFinancialServiceProvidersFromCache(TAG_SEND_MONEY);
 
-            if(cachedFSPs.isEmpty()){
+            if (cachedFSPs.isEmpty()) {
                 getSendFinancialServiceProviders();
-            }else {
+            } else {
                 //get bundle data from search activity
                 Bundle bundle = getActivity().getIntent().getExtras();
                 searchResultsList = (List<FinancialServiceProvider>) bundle.getSerializable(SEARCH_RESULTS);
                 String fragment = bundle.getString(TAG_FRAGMENT);
-                if(searchResultsList != null && (fragment != null && fragment.equals(TAG_SEND_MONEY))){
-                    if(searchResultsList.size() > 0){
+                if (searchResultsList != null && (fragment != null && fragment.equals(TAG_SEND_MONEY))) {
+                    getActivity().getIntent().removeExtra(TAG_FRAGMENT);
+                    if (searchResultsList.size() > 0) {
                         loadSearchResults();
+                    } else {
+                        Toast.makeText(getContext(), "nothing found", Toast.LENGTH_SHORT).show();
+                        new GetProvidersTask(TAG_SEND_MONEY, getContext(), getActivity(), financialServiceProviderList, FSPList, financialServiceProviderAdapter).execute();
+
                     }
-                }else{
+                } else {
                     new GetProvidersTask(TAG_SEND_MONEY, getContext(), getActivity(), financialServiceProviderList, FSPList, financialServiceProviderAdapter).execute();
 
                 }
@@ -221,10 +227,8 @@ public class SendMoneyFSPFragment extends Fragment {
         if (id == R.id.action_map_toggle) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mapView.getLayoutParams();
             if (params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
+                fragmentService.setUpMap(financialServiceProviderList, false);
                 fragmentService.deflateAllFspMarkers();
-
-                MapController mapController = (MapController) mapView.getController();
-                mapController.setCenter(AppManager.getDeviceGeoPoint());
             }
             return true;
         } else {
@@ -236,12 +240,6 @@ public class SendMoneyFSPFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
@@ -259,6 +257,10 @@ public class SendMoneyFSPFragment extends Fragment {
         call.enqueue(new Callback<List<FinancialServiceProvider>>() {
             @Override
             public void onResponse(Call<List<FinancialServiceProvider>> call, Response<List<FinancialServiceProvider>> response) {
+                Context context = getContext();
+                if(context == null)
+                    //App was closed or sth close to that
+                    return;
                 FSPList.clear();
 
                 FinancialServiceProviderViewModel fspViewModel;
@@ -269,6 +271,7 @@ public class SendMoneyFSPFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
+                    Log.d("ERROR: ", response.errorBody().toString());
                     Toast.makeText(getContext(), "Unable to fetch data, try again later", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(getContext(), MainActivity.class);
                     startActivity(intent);
@@ -282,6 +285,10 @@ public class SendMoneyFSPFragment extends Fragment {
             @Override
             public void onFailure(Call<List<FinancialServiceProvider>> call, Throwable t) {
                 Log.d("ERROR: ", t.getMessage());
+                Context context = getContext();
+                if(context == null)
+                    //App was closed or sth close to that
+                    return;
                 Toast.makeText(getContext(), "Unable to fetch data, try again later", Toast.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
                 Intent intent = new Intent(getContext(), MainActivity.class);

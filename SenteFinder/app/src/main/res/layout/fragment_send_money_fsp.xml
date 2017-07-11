@@ -124,8 +124,8 @@
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/fsp_location_icon"
                         android:layout_toRightOf="@+id/fsp_location_icon"
-                        android:paddingLeft="30dp"
-                        android:paddingStart="30dp" />
+                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -149,8 +149,8 @@
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/fsp_clock_icon"
                         android:layout_toRightOf="@+id/fsp_clock_icon"
-                        android:paddingLeft="30dp"
-                        android:paddingStart="30dp"
+                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp"
                         android:text="@string/opening_hours" />
 
                     <TextView
@@ -160,8 +160,8 @@
                         android:layout_below="@+id/fsp_opening_hours_label"
                         android:layout_toEndOf="@+id/fsp_clock_icon"
                         android:layout_toRightOf="@+id/fsp_clock_icon"
-                        android:paddingLeft="30dp"
-                        android:paddingStart="30dp" />
+                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -186,8 +186,8 @@
                         android:layout_toEndOf="@+id/fsp_phone_icon"
                         android:layout_toRightOf="@+id/fsp_phone_icon"
                         android:autoLink="phone"
-                        android:paddingLeft="30dp"
-                        android:paddingStart="30dp"
+                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp"
                         android:textColorLink="@color/colorGrey" />
                 </RelativeLayout>
 

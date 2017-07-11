@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -43,6 +44,7 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
     private static final String TAG_SEND_MONEY = "SEND_MONEY";
     private static final String TAG_WITHDRAW_MONEY = "WITHDRAW_MONEY";
     private static final String TAG_TITLE = "TAG_TITLE";
+    private static final String TAG = "FinancialServiceProviderListActivity";
     public static int navigationItemIndex = 0;
     private static String CURRENT_TAG;
     private Toolbar toolbar;
@@ -57,7 +59,6 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
     private MenuItem menuMapItem;
     private MenuItem menuSearchItem;
     private String[] fragmentTitles;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,9 +118,6 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Bundle bundle = new Bundle();
-        bundle.putString(TAG_FRAGMENT, CURRENT_TAG);
-        bundle.putString(TAG_TITLE, fragmentTitles[navigationItemIndex]);
 
         FragmentManager fragmentManager = FinancialServiceProviderListActivity.this.getSupportFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();
@@ -141,7 +139,7 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
                             relativeLayout = (RelativeLayout) fragment.getView().findViewById(R.id.fsp_map_and_detail_view);
                             relativeLayout.setVisibility(View.VISIBLE);
 
-                            swipeRefreshLayout = (SwipeRefreshLayout)fragment.getView().findViewById(R.id.swipe_refresh_layout);
+                            swipeRefreshLayout = (SwipeRefreshLayout) fragment.getView().findViewById(R.id.swipe_refresh_layout);
                             swipeRefreshLayout.setVisibility(View.INVISIBLE);
                         }
                     }
@@ -156,22 +154,23 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
                             menuSearchItem.setVisible(true);
                             menuMapItem.setVisible(true);
 
-                            relativeLayout = (RelativeLayout)fragment.getView().findViewById(R.id.fsp_map_and_detail_view);
+                            relativeLayout = (RelativeLayout) fragment.getView().findViewById(R.id.fsp_map_and_detail_view);
                             relativeLayout.setVisibility(View.INVISIBLE);
 
-                            swipeRefreshLayout = (SwipeRefreshLayout)fragment.getView().findViewById(R.id.swipe_refresh_layout);
+                            swipeRefreshLayout = (SwipeRefreshLayout) fragment.getView().findViewById(R.id.swipe_refresh_layout);
                             swipeRefreshLayout.setVisibility(View.VISIBLE);
                         }
                     }
                 }
-
                 return true;
             case R.id.action_search:
+                Bundle bundle = new Bundle();
+                bundle.putString(TAG_FRAGMENT, CURRENT_TAG);
+                bundle.putString(TAG_TITLE, fragmentTitles[navigationItemIndex]);
                 Intent intent = new Intent(this, FinancialServiceProviderSearchActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 finish();
-
                 return true;
         }
 
@@ -187,7 +186,7 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
         Fragment fragment = null;
         Class fragmentClass = null;
 
-        switch(id){
+        switch (id) {
             case R.id.nav_home:
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
@@ -220,7 +219,7 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
 
         try {
             assert fragmentClass != null;
-            fragment = (Fragment)fragmentClass.newInstance();
+            fragment = (Fragment) fragmentClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,11 +235,13 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
     }
 
     private void setFragmentTitle() {
-        getSupportActionBar().setTitle(fragmentTitles[navigationItemIndex]);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setTitle(fragmentTitles[navigationItemIndex]);
     }
 
     private void changeAppBarMenuItems() {
-        if(menuListItem.isVisible()){
+        if (menuListItem.isVisible()) {
             menuListItem.setVisible(false);
             menuSearchItem.setVisible(true);
             menuMapItem.setVisible(true);
@@ -252,8 +253,8 @@ public class FinancialServiceProviderListActivity extends AppCompatActivity impl
         Bundle bundle = getIntent().getExtras();
         String tag = bundle.getString(TAG_FRAGMENT);
 
-        if(tag != null){
-            switch (tag){
+        if (tag != null) {
+            switch (tag) {
                 case TAG_BORROW_MONEY:
                     navigationItemIndex = 1;
                     navigationView.getMenu().getItem(navigationItemIndex).setChecked(true);

@@ -17,6 +17,9 @@ public class InternalStorageService {
     private InternalStorageService(){}
 
     public static void writeCacheToFile(Context context, String fileName, Object object) throws IOException {
+        if(context ==null)
+            // If user migrates away from activity before fetch completes this throws an exception
+            return;
         FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(object);

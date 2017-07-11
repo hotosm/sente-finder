@@ -1,21 +1,20 @@
 package com.hot.sentefinder.activities;
 
 import android.app.Activity;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.LayerDrawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hot.sentefinder.R;
@@ -29,27 +28,29 @@ import retrofit2.Response;
 
 
 public class ReviewActivity extends AppCompatActivity {
-    private Toolbar toolbar;
-    private RatingBar ratingBar;
     private EditText commentText;
-    private Button submitButton;
+    private ProgressBar progressBar;
     float ratingValue;
-    String commentValue= "";
+    String commentValue = "";
     private static final String TAG_FSP_ID = "TAG_FSP_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setTitle(R.string.review);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ratingBar = (RatingBar)findViewById(R.id.fsp_rating);
-        commentText = (EditText)findViewById(R.id.fsp_comment);
-        submitButton = (Button)findViewById(R.id.fsp_review_submit_button);
+        progressBar = (ProgressBar) findViewById(R.id.review_progress);
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.fsp_rating);
+        commentText = (EditText) findViewById(R.id.fsp_comment);
+        final TextView reviewMeaning = (TextView) findViewById(R.id.fsp_review_meaning);
+        Button submitButton = (Button) findViewById(R.id.fsp_review_submit_button);
+
+        Resources res = getResources();
+        final String[] meanings = res.getStringArray(R.array.fsp_review_meanings_array);
 
         Bundle bundle = getIntent().getExtras();
         final long fspId = bundle.getLong(TAG_FSP_ID);
@@ -59,7 +60,9 @@ public class ReviewActivity extends AppCompatActivity {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 ratingValue = rating;
-
+                int pos = (int) rating;
+                if (pos <= 5 && pos > 0)
+                    reviewMeaning.setText(meanings[pos - 1]);
             }
         });
 
@@ -68,12 +71,13 @@ public class ReviewActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(ratingValue > 0 || !commentValue.isEmpty()){
-                    FeedBack feedBack = new FeedBack(fspId, (int)ratingValue, commentValue);
+                progressBar.setVisibility(View.VISIBLE);
+                if (ratingValue > 0 || !commentValue.isEmpty()) {
+                    FeedBack feedBack = new FeedBack(fspId, (int) ratingValue, commentValue);
+                    commentText.clearFocus();
                     sendFeedBack(feedBack);
                     hideKeyboard(ReviewActivity.this);
-                }else{
+                } else {
                     requestFocus(commentText);
                 }
             }
@@ -88,11 +92,12 @@ public class ReviewActivity extends AppCompatActivity {
         call.enqueue(new Callback<FeedBack>() {
             @Override
             public void onResponse(Call<FeedBack> call, Response<FeedBack> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     Toast.makeText(ReviewActivity.this, "Your review has been posted", Toast.LENGTH_LONG).show();
                     ReviewActivity.this.finish();
-                }else{
-                    if(response.body() != null){
+                } else {
+                    if (response.body() != null) {
+                        progressBar.setVisibility(View.INVISIBLE);
                         Toast.makeText(ReviewActivity.this, response.message(), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -104,6 +109,7 @@ public class ReviewActivity extends AppCompatActivity {
                 Toast.makeText(ReviewActivity.this, "Unable to send review, try again later", Toast.LENGTH_LONG).show();
             }
         });
+//        progressBar.setVisibility(View.INVISIBLE);
     }
 
     private void requestFocus(View view) {

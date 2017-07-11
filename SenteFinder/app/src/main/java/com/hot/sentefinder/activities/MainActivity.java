@@ -3,18 +3,18 @@ package com.hot.sentefinder.activities;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -42,11 +42,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.provider.Contacts.SettingsColumns.KEY;
-
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    private static final String PREFERENCES_KEY = "com.hot.sentefinder.PRIVATE_PREFS";
+    private static final String LOC_LONGITUDE = "LONGITUDE";
+    private static final String LOC_LATITUDE = "LATITUDE";
     private static final String TAG_BORROW_MONEY = "BORROW_MONEY";
     private static final String TAG_SAVE_MONEY = "SAVE_MONEY";
     private static final String TAG_SEND_MONEY = "SEND_MONEY";
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int UPDATE_INTERVAL = 60000; //1 minute
     private static final int FASTEST_INTERVAL = 5000; //5 seconds
     private static final int DISPLACEMENT = 10; //10 metres
+    private static final String TAG = "MainActivity";
 
     Intent intent;
     Bundle bundle;
@@ -83,11 +85,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         if (checkPlayServices()) {
             buildGoogleApiClient();
+            createLocationRequest();
+            checkLocationSettingsStatus();
+        } else {
+            Toast.makeText(this, "This device does not support google play services.", Toast.LENGTH_LONG).show();
         }
-
-        createLocationRequest();
-        checkLocationSettingsStatus();
-
         intent = new Intent(context, FinancialServiceProviderListActivity.class);
         bundle = new Bundle();
 
@@ -100,8 +102,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 bundle.putString(TAG_FRAGMENT, TAG_BORROW_MONEY);
                 intent.putExtras(bundle);
                 startActivity(intent);
-            }else{
+            } else {
                 checkLocationSettingsStatus();
+                Toast.makeText(getApplicationContext(), "Failed to acquire device Location", Toast.LENGTH_LONG).show();
             }
 
         } else {
@@ -112,12 +115,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void loadSaveFragment(View view) {
         if (AppManager.isOnline(getApplicationContext())) {
             GeoPoint deviceGeoPoint = AppManager.getDeviceGeoPoint();
-            if(deviceGeoPoint != null){
+            if (deviceGeoPoint != null) {
                 bundle.putString(TAG_FRAGMENT, TAG_SAVE_MONEY);
                 intent.putExtras(bundle);
                 startActivity(intent);
-            }else{
+            } else {
                 checkLocationSettingsStatus();
+                Toast.makeText(getApplicationContext(), "Failed to acquire device Location", Toast.LENGTH_LONG).show();
             }
 
         } else {
@@ -128,15 +132,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void loadSendFragment(View view) {
         if (AppManager.isOnline(getApplicationContext())) {
             GeoPoint deviceGeoPoint = AppManager.getDeviceGeoPoint();
-            if(deviceGeoPoint != null){
+            if (deviceGeoPoint != null) {
                 bundle.putString(TAG_FRAGMENT, TAG_SEND_MONEY);
                 intent.putExtras(bundle);
                 startActivity(intent);
-            }else{
+            } else {
                 checkLocationSettingsStatus();
+                Toast.makeText(getApplicationContext(), "Failed to acquire device Location", Toast.LENGTH_LONG).show();
             }
-
-
         } else {
             Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
         }
@@ -145,24 +148,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void loadWithdrawFragment(View view) {
         if (AppManager.isOnline(getApplicationContext())) {
             GeoPoint deviceGeoPoint = AppManager.getDeviceGeoPoint();
-            if(deviceGeoPoint != null){
+            if (deviceGeoPoint != null) {
                 bundle.putString(TAG_FRAGMENT, TAG_WITHDRAW_MONEY);
                 intent.putExtras(bundle);
                 startActivity(intent);
-            }else{
+            } else {
                 checkLocationSettingsStatus();
+                Toast.makeText(getApplicationContext(), "Failed to acquire device Location", Toast.LENGTH_LONG).show();
             }
-
-
         } else {
             Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
         }
     }
 
     private boolean checkPlayServices() {
+        Log.i(TAG, "verifying google play services.");
         GoogleApiAvailability googleApi = GoogleApiAvailability.getInstance();
         int resultCode = googleApi.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
+        if (resultCode != ConnectionResult.SUCCESS ) {
             if (googleApi.isUserResolvableError(resultCode)) {
                 googleApi.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
@@ -171,14 +174,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
             return false;
         }
+        Log.i(TAG, "google play services, Okie.");
         return true;
     }
 
     protected synchronized void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this)
-            .addConnectionCallbacks(this)
-            .addOnConnectionFailedListener(this)
-            .addApi(LocationServices.API).build();
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
     }
 
     protected void createLocationRequest() {
@@ -228,22 +232,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == CHECK_LOCATION_SETTINGS_REQUEST){
-            if(resultCode == Activity.RESULT_OK){
+        if (requestCode == CHECK_LOCATION_SETTINGS_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
                 getDeviceLocation();
             }
         }
     }
 
     protected void startLocationUpdates() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
 
     }
 
     protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
     }
 
     @Override
@@ -259,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onResume();
 
         checkPlayServices();
-        if (googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             startLocationUpdates();
         }
     }
@@ -267,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStop() {
         super.onStop();
-        if (googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
     }
@@ -286,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionSuspended(int i) {
+        if (googleApiClient != null)
         googleApiClient.connect();
     }
 
@@ -296,11 +303,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(Location location) {
+
+        GeoPoint oldGeoPoint = AppManager.getDeviceGeoPoint();
         getDeviceLocation();
         lastLocation = location;
-
-        emptyCache();
-        Toast.makeText(this, "device location changed", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Geo-Location Changed: Old " + oldGeoPoint + " New: " + location);
+        if (lastLocation != null && oldGeoPoint != null) {
+            GeoPoint newGeoPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+            double distanceBtnGeoPoints = newGeoPoint.distanceTo(oldGeoPoint);
+            if (distanceBtnGeoPoints >= 500) {
+                emptyCache();
+                //Toast.makeText(this, "Device location changed", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Geo-Location Updated");
+            }
+        }
     }
 
     private void emptyCache() {
@@ -322,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void getDeviceLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        }else{
+        } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
         }
 
@@ -331,15 +347,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void saveDeviceGeoPoint() {
+        SharedPreferences sharedPref = getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
         if (lastLocation != null) {
             double latitude = lastLocation.getLatitude();
             double longitude = lastLocation.getLongitude();
-
-            Toast.makeText(this, latitude + "," + longitude, Toast.LENGTH_SHORT).show();
-
             deviceGeoPoint = new GeoPoint(latitude, longitude);
             AppManager.saveGeoPoint(deviceGeoPoint);
-
+            final double oLatitude = Double.parseDouble(sharedPref.getString(LOC_LATITUDE, "0"));
+            final double oLongitude = Double.parseDouble(sharedPref.getString(LOC_LONGITUDE, "0"));
+            GeoPoint oldGeoPoint = new GeoPoint(oLatitude, oLongitude);
+            System.out.println("oldGeoPoint = " + oldGeoPoint);
+            double distanceBtnGeoPoints = deviceGeoPoint.distanceTo(oldGeoPoint);
+            if (distanceBtnGeoPoints > 500) {
+                emptyCache();
+                //Toast.makeText(this, "Device location changed", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Geo-Location Updated");
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(LOC_LATITUDE, latitude + "");
+                editor.putString(LOC_LONGITUDE, longitude + "");
+                editor.apply();
+            }
         }
     }
 

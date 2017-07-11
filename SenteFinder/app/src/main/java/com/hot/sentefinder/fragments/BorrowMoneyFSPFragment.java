@@ -1,9 +1,11 @@
 package com.hot.sentefinder.fragments;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -36,9 +38,11 @@ import com.hot.sentefinder.utilities.ApplicationPreference;
 import com.hot.sentefinder.utilities.TouchListener;
 import com.hot.sentefinder.viewmodels.FinancialServiceProviderViewModel;
 
+import org.osmdroid.config.Configuration;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +58,7 @@ public class BorrowMoneyFSPFragment extends Fragment {
     private final String SEARCH_RESULTS = "SEARCH_RESULTS";
     private static final String TAG_FRAGMENT = "FRAGMENT";
     private static long FSP_ID = 0;
-    String searchParam;
+    private String searchParam;
     private List<FinancialServiceProviderViewModel> FSPList = new ArrayList<>();
     private List<FinancialServiceProvider> financialServiceProviderList = new ArrayList<>();
     private List<FinancialServiceProvider> searchResultsList = new ArrayList<>();
@@ -68,6 +72,7 @@ public class BorrowMoneyFSPFragment extends Fragment {
     private FragmentService fragmentService;
     private OnFragmentInteractionListener mListener;
     private ApplicationPreference applicationPreference;
+    private Bundle searchBundle;
 
     public BorrowMoneyFSPFragment() {
         // Required empty public constructor
@@ -90,10 +95,11 @@ public class BorrowMoneyFSPFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_borrow_money_fsp, container, false);
 
         //initialize the views on the layout
-        swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipe_refresh_layout);
-        recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview);
         relativeLayout = (RelativeLayout) rootView.findViewById(R.id.fsp_map_and_detail_view);
         mapView = (MapView) rootView.findViewById(R.id.map);
+        mapView.invalidate();
 
         //initialize the relative review button
         fspReviewButton = (Button) rootView.findViewById(R.id.fsp_review_button);
@@ -125,6 +131,7 @@ public class BorrowMoneyFSPFragment extends Fragment {
                 swipeRefreshLayout.setVisibility(View.INVISIBLE);
 
                 fragmentService.updateTextViewsWithFSPDetails(fsp);
+                fragmentService.deflateAllFspMarkers();
                 fragmentService.inflateFspMarker(fsp);
                 fragmentService.toggleMapHeight(fsp);
 
@@ -144,23 +151,27 @@ public class BorrowMoneyFSPFragment extends Fragment {
         });
 
         //if its the first time the app is loading get data from api else get data from the cache
-        if(applicationPreference.readFirstLoadPreference()){
+        if (applicationPreference.readFirstLoadPreference()) {
             getBorrowFinancialServiceProviders();
-        }
-        else{
+        } else {
             List<FinancialServiceProvider> cachedFSPs = fragmentService.getFinancialServiceProvidersFromCache(TAG_BORROW_MONEY);
-            if(cachedFSPs.isEmpty()){
+            if (cachedFSPs.isEmpty()) {
                 getBorrowFinancialServiceProviders();
-            }else {
+            } else {
                 //get bundle data from search activity
-                Bundle bundle = getActivity().getIntent().getExtras();
-                searchResultsList = (List<FinancialServiceProvider>) bundle.getSerializable(SEARCH_RESULTS);
-                String fragment = bundle.getString(TAG_FRAGMENT);
-                if(searchResultsList != null && (fragment != null && fragment.equals(TAG_BORROW_MONEY))){
-                    if(searchResultsList.size() > 0){
+                searchBundle = getActivity().getIntent().getExtras();
+                searchResultsList = (List<FinancialServiceProvider>) searchBundle.getSerializable(SEARCH_RESULTS);
+                String fragment = searchBundle.getString(TAG_FRAGMENT);
+                if (searchResultsList != null && (fragment != null && fragment.equals(TAG_BORROW_MONEY))) {
+                    getActivity().getIntent().removeExtra(TAG_FRAGMENT);
+                    if (searchResultsList.size() > 0) {
                         loadSearchResults();
+                    } else {
+                        Toast.makeText(getContext(), "nothing found", Toast.LENGTH_SHORT).show();
+                        new GetProvidersTask(TAG_BORROW_MONEY, getContext(), getActivity(), financialServiceProviderList, FSPList, financialServiceProviderAdapter).execute();
+
                     }
-                }else{
+                } else {
                     new GetProvidersTask(TAG_BORROW_MONEY, getContext(), getActivity(), financialServiceProviderList, FSPList, financialServiceProviderAdapter).execute();
 
                 }
@@ -220,9 +231,7 @@ public class BorrowMoneyFSPFragment extends Fragment {
         if (id == R.id.action_map_toggle) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mapView.getLayoutParams();
             if (params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
-                MapController mapController = (MapController) mapView.getController();
-                mapView.invalidate();
-                mapController.setCenter(AppManager.getDeviceGeoPoint());
+                fragmentService.setUpMap(financialServiceProviderList, false);
                 fragmentService.deflateAllFspMarkers();
             }
             return true;
@@ -235,12 +244,6 @@ public class BorrowMoneyFSPFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
@@ -258,6 +261,10 @@ public class BorrowMoneyFSPFragment extends Fragment {
         call.enqueue(new Callback<List<FinancialServiceProvider>>() {
             @Override
             public void onResponse(Call<List<FinancialServiceProvider>> call, Response<List<FinancialServiceProvider>> response) {
+                Context context = getContext();
+                if(context == null)
+                    //App was closed or sth close to that
+                    return;
                 FSPList.clear();
 
                 if (response.body() != null) {
@@ -268,6 +275,7 @@ public class BorrowMoneyFSPFragment extends Fragment {
                     }
 
                 } else {
+                    Log.d("ERROR: ", response.errorBody().toString());
                     Toast.makeText(getContext(), "Unable to fetch data, try again later", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(getContext(), MainActivity.class);
                     startActivity(intent);
@@ -280,6 +288,10 @@ public class BorrowMoneyFSPFragment extends Fragment {
             @Override
             public void onFailure(Call<List<FinancialServiceProvider>> call, Throwable t) {
                 Log.d("ERROR: ", t.getMessage());
+                Context context = getContext();
+                if(context == null)
+                    //App was closed or sth close to that
+                    return;
                 Toast.makeText(getContext(), "Unable to fetch data, try again later", Toast.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
                 Intent intent = new Intent(getContext(), MainActivity.class);
@@ -302,5 +314,4 @@ public class BorrowMoneyFSPFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
 }

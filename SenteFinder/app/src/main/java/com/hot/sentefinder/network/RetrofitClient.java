@@ -4,9 +4,14 @@ package com.hot.sentefinder.network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.CipherSuite;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -15,12 +20,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitClient {
-    public static final String BASE_URL = "https://hotapi.laboremus.biz/api/";
-    static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+
+    private static final String BASE_URL = "https://hot-api.laboremus.no/api/";
+    private static HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+    static {
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+    }
+    private static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .readTimeout(60, TimeUnit.SECONDS)
             .connectTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(interceptor)
             .build();
-    static Gson gson = new GsonBuilder()
+    private static Gson gson = new GsonBuilder()
             .setLenient()
             .create();
     private static Retrofit retrofit = null;

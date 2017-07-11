@@ -19,7 +19,7 @@ import java.util.List;
  * Created by Jamie on 4/5/2017.
  */
 
-public class FinancialServiceProviderAdapter extends RecyclerView.Adapter<FinancialServiceProviderAdapter.ViewHolder>{
+public class FinancialServiceProviderAdapter extends RecyclerView.Adapter<FinancialServiceProviderAdapter.ViewHolder> {
     private Context context;
     private List<FinancialServiceProviderViewModel> FSPList;
 
@@ -46,8 +46,31 @@ public class FinancialServiceProviderAdapter extends RecyclerView.Adapter<Financ
         holder.distance.setText(AppManager.convertDistanceToString(distance));
 
         String amenityType = fspViewModel.getAmenity();
-        if (amenityType.equals("bank")) {
-            Picasso.with(context).load(R.drawable.ic_bank).into(holder.fspImageView);
+        switch (amenityType) {
+            case "bank":
+            case "banking_agent":
+            case "credit_institution":
+                Picasso.with(context).load(R.drawable.ic_bank).into(holder.fspImageView);
+                break;
+            case "mobile_money_agent":
+                Picasso.with(context).load(R.drawable.ic_mobile_money).into(holder.fspImageView);
+                break;
+            case "atm":
+                Picasso.with(context).load(R.drawable.ic_fsp_atm).into(holder.fspImageView);
+                break;
+            case "sacco":
+                Picasso.with(context).load(R.drawable.ic_fsp_sacco).into(holder.fspImageView);
+                break;
+            case "microfinance_bank":
+            case "microfinance":
+                Picasso.with(context).load(R.drawable.ic_fsp_mfi).into(holder.fspImageView);
+                break;
+            case "bureau_de_change":
+                Picasso.with(context).load(R.drawable.ic_fsp_forex).into(holder.fspImageView);
+                break;
+            case "post_office":
+                Picasso.with(context).load(R.drawable.ic_fsp_post_office).into(holder.fspImageView);
+                break;
         }
 
     }
@@ -57,7 +80,7 @@ public class FinancialServiceProviderAdapter extends RecyclerView.Adapter<Financ
         return FSPList.size();
     }
 
-    public FinancialServiceProviderViewModel getFinancialServiceProvider(int position){
+    public FinancialServiceProviderViewModel getFinancialServiceProvider(int position) {
         return FSPList.get(position);
     }
 
@@ -68,9 +91,9 @@ public class FinancialServiceProviderAdapter extends RecyclerView.Adapter<Financ
         public ViewHolder(View itemView) {
             super(itemView);
             fspImageView = (ImageView) itemView.findViewById(R.id.fsp_icon);
-            name = (TextView)itemView.findViewById(R.id.fsp_name);
-            operator = (TextView)itemView.findViewById(R.id.fsp_operator);
-            distance = (TextView)itemView.findViewById(R.id.fsp_distance_from_user);
+            name = (TextView) itemView.findViewById(R.id.fsp_name);
+            operator = (TextView) itemView.findViewById(R.id.fsp_operator);
+            distance = (TextView) itemView.findViewById(R.id.fsp_distance_from_user);
         }
     }
 }

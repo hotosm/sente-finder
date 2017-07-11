@@ -52,5 +52,13 @@
     //application preference
     <string name="application_preference">com.hot.sentefinder</string>
     <string name="first_load">first load</string>
+    <string name="baseReview">…</string>
+    <string-array name="fsp_review_meanings_array">
+        <item>Very Inaccurate</item>
+        <item>Inaccurate</item>
+        <item>Fairly Accurate</item>
+        <item>Accurate</item>
+        <item>Very Accurate</item>
+    </string-array>
 
 </resources>

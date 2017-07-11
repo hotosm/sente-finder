@@ -4,10 +4,10 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.hot.sentefinder"
+        applicationId "com.app.sentefinder"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 1
+        versionCode 12
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -31,7 +31,7 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:percent:25.3.1'
-    compile 'com.google.android.gms:play-services-location:10.2.1'
+    compile 'com.google.android.gms:play-services-location:11.0.2'
 
     //osm
     compile 'org.osmdroid:osmdroid-android:5.6.4'
@@ -42,7 +42,8 @@ dependencies {
     //Json Parsing
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
     //image
     compile 'com.squareup.picasso:picasso:2.5.2'
 

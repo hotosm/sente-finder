@@ -32,7 +32,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FinancialServiceProviderSearchActivity extends AppCompatActivity {
-//    private Toolbar toolbar;
     private SearchManager searchManager;
     private ListView fspListView;
     private ProgressBar progressBar;
@@ -44,7 +43,7 @@ public class FinancialServiceProviderSearchActivity extends AppCompatActivity {
     private Bundle searchBundle;
 
     private static final String TAG_FRAGMENT = "FRAGMENT";
-    String activeFragmentString;
+    private String activeFragmentString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +110,7 @@ public class FinancialServiceProviderSearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 searchBundle.putString(TAG_FRAGMENT, activeFragmentString);
-                searchBorrowFSps(s);
+                searchForFSPs(s, activeFragmentString);
                 return true;
             }
 
@@ -180,16 +179,28 @@ public class FinancialServiceProviderSearchActivity extends AppCompatActivity {
         });
     }
 
-    public void searchBorrowFSps(String queryString) {
-        List<FinancialServiceProvider> list = AppManager.getAllFinancialServiceProviderList();
+    public void searchForFSPs(String queryString, String fragment) {
+        List<FinancialServiceProvider> list = new ArrayList<>();
+        switch(fragment){
+            case "BORROW_MONEY":
+                list = AppManager.borrowFinancialServiceProviderList;
+                break;
+            case "SAVE_MONEY":
+                list = AppManager.saveFinancialServiceProviderList;
+                break;
+            case "SEND_MONEY":
+                list = AppManager.sendFinancialServiceProviderList;
+                break;
+            case "WITHDRAW_MONEY":
+                list = AppManager.withdrawFinancialServiceProviderList;
+                break;
+        }
 
         fspResultList.clear();
         if (list != null) {
-            search(queryString);
+            search(queryString, list);
             searchBundle.putSerializable(SEARCH_RESULTS, (Serializable) fspResultList);
-            Toast.makeText(context, "success", Toast.LENGTH_SHORT).show();
             returnToPreviousActivity(searchBundle);
-
         } else {
             Toast.makeText(getApplicationContext(), "Unable to fetch data, try again later", Toast.LENGTH_LONG).show();
             returnToPreviousActivity(searchBundle);
@@ -203,12 +214,12 @@ public class FinancialServiceProviderSearchActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void search(String queryString){
+    // TODO use hamming distance search for better results
+    private void search(String queryString, List<FinancialServiceProvider> searchList){
         queryString = queryString.toLowerCase(Locale.getDefault());
-
         fspResultList.clear();
         if(queryString.length() != 0){
-            for(FinancialServiceProvider fsp: AppManager.getAllFinancialServiceProviderList()){
+            for(FinancialServiceProvider fsp: searchList){
                 if(fsp.getName().toLowerCase(Locale.getDefault()).contains(queryString)){
                     fspResultList.add(fsp);
                 }

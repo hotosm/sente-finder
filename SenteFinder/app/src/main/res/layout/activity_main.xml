@@ -28,11 +28,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="?attr/actionBarSize"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:isScrollContainer="true">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:isScrollContainer="true"
             android:orientation="vertical"
             android:padding="10dp">
 
@@ -61,7 +63,7 @@
                             android:id="@+id/borrow_img"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@drawable/ic_action_borrow"/>
+                            android:src="@drawable/ic_action_borrow" />
 
                         <TextView
                             android:id="@+id/boroow_text"
@@ -98,7 +100,7 @@
                             android:id="@+id/save_img"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@drawable/ic_action_save"/>
+                            android:src="@drawable/ic_action_save" />
 
                         <TextView
                             android:id="@+id/save_text"
@@ -139,7 +141,7 @@
                             android:id="@+id/send_img"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@drawable/ic_action_send"/>
+                            android:src="@drawable/ic_action_send" />
 
                         <TextView
                             android:id="@+id/send_text"
@@ -175,7 +177,7 @@
                             android:id="@+id/withdraw_img"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@drawable/ic_action_withdraw"/>
+                            android:src="@drawable/ic_action_withdraw" />
 
                         <TextView
                             android:id="@+id/withdraw_text"
