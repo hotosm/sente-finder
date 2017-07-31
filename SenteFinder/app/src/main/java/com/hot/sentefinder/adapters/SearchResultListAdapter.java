@@ -58,7 +58,7 @@ public class SearchResultListAdapter extends ArrayAdapter<FinancialServiceProvid
 
         public TextView getItem() {
             if (null == item) {
-                item = (TextView) mRow.findViewById(R.id.item_text);
+                item = (TextView) mRow.findViewById(R.id.list_item);
             }
             return item;
         }

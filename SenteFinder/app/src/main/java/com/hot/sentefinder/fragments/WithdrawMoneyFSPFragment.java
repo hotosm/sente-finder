@@ -36,7 +36,7 @@ import com.hot.sentefinder.utilities.ApplicationPreference;
 import com.hot.sentefinder.utilities.TouchListener;
 import com.hot.sentefinder.viewmodels.FinancialServiceProviderViewModel;
 
-import org.osmdroid.views.MapController;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import java.io.IOException;
@@ -47,13 +47,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.provider.Contacts.SettingsColumns.KEY;
-
 
 public class WithdrawMoneyFSPFragment extends Fragment {
     private static final String TAG_WITHDRAW_MONEY = "WITHDRAW_MONEY";
     private static final String TAG_FSP_ID = "TAG_FSP_ID";
     private final String SEARCH_RESULTS = "SEARCH_RESULTS";
+    private final String SEARCH_COORDINATES = "SEARCH_COORDINATES";
     private static final String TAG_FRAGMENT = "FRAGMENT";
     private static long FSP_ID = 0;
     String searchParam;
@@ -70,6 +69,7 @@ public class WithdrawMoneyFSPFragment extends Fragment {
     private FragmentService fragmentService;
     private OnFragmentInteractionListener mListener;
     private ApplicationPreference applicationPreference;
+    private Bundle searchBundle;
 
     public WithdrawMoneyFSPFragment() {
         // Required empty public constructor
@@ -90,7 +90,7 @@ public class WithdrawMoneyFSPFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_borrow_money_fsp, container, false);
+        View rootView = inflater.inflate(R.layout.base_fragment, container, false);
 
         //initialize the views on the layout
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
@@ -116,8 +116,8 @@ public class WithdrawMoneyFSPFragment extends Fragment {
                 FinancialServiceProviderViewModel fspViewModel = financialServiceProviderAdapter.getFinancialServiceProvider(position);
 
                 FSP_ID = fspViewModel.getId();
-                FinancialServiceProvider fsp = AppManager.getFSPById(TAG_WITHDRAW_MONEY, FSP_ID);
-                fragmentService.setUpMap(financialServiceProviderList);
+                FinancialServiceProvider fsp = AppManager.getFinancialServiceProviderById(TAG_WITHDRAW_MONEY, FSP_ID);
+                fragmentService.setUpMap(financialServiceProviderList, AppManager.getDeviceGeoPoint());
                 //if fsp is null get the fsp from allfsplist in appmanager
 
                 searchMenuItem.setVisible(false);
@@ -155,9 +155,9 @@ public class WithdrawMoneyFSPFragment extends Fragment {
                 getWithdrawFinancialServiceProviders();
             }else {
                 //get bundle data from search activity
-                Bundle bundle = getActivity().getIntent().getExtras();
-                searchResultsList = (List<FinancialServiceProvider>) bundle.getSerializable(SEARCH_RESULTS);
-                String fragment = bundle.getString(TAG_FRAGMENT);
+                searchBundle = getActivity().getIntent().getExtras();
+                searchResultsList = (List<FinancialServiceProvider>) searchBundle.getSerializable(SEARCH_RESULTS);
+                String fragment = searchBundle.getString(TAG_FRAGMENT);
                 if(searchResultsList != null && (fragment != null && fragment.equals(TAG_WITHDRAW_MONEY))){
                     getActivity().getIntent().removeExtra(TAG_FRAGMENT);
                     if(searchResultsList.size() > 0){
@@ -225,11 +225,19 @@ public class WithdrawMoneyFSPFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        searchBundle = getActivity().getIntent().getExtras();
+        GeoPoint searchGeoPoint = (GeoPoint) searchBundle.getSerializable(SEARCH_COORDINATES);
+        String fragment = searchBundle.getString(TAG_FRAGMENT);
         if (id == R.id.action_map_toggle) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mapView.getLayoutParams();
             if (params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
-                fragmentService.setUpMap(financialServiceProviderList, false);
-                fragmentService.deflateAllFspMarkers();
+                if (searchGeoPoint != null) {
+                    fragmentService.setUpMap(financialServiceProviderList, searchGeoPoint, false);
+                }
+                else{
+                    fragmentService.setUpMap(financialServiceProviderList, AppManager.getDeviceGeoPoint(), false);
+                }
+//                fragmentService.deflateAllFspMarkers();
             }
             return true;
         } else {
@@ -246,6 +254,7 @@ public class WithdrawMoneyFSPFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        getActivity().getIntent().removeExtra(SEARCH_COORDINATES);
         mListener = null;
     }
 

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.hot.sentefinder.fragments.SaveMoneyFSPFragment">
+    tools:context="com.hot.sentefinder.fragments.BorrowMoneyFSPFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
@@ -116,7 +116,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/ic_action_location"
-                        app:backgroundTint="@color/colorPrimary" />
+                        app:backgroundTint="@color/colorPrimary"/>
 
                     <TextView
                         android:id="@+id/fsp_location_text"

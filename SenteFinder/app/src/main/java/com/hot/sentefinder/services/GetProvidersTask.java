@@ -62,7 +62,7 @@ public class GetProvidersTask extends AsyncTask<Void, Void, List<FinancialServic
             financialServiceProviderAdapter.notifyDataSetChanged();
         }
         AppManager.createFinancialServiceProvidersList(fragmentTag, FSPs);
-        fragmentService.setUpMap(financialServiceProviderList);
+        fragmentService.setUpMap(financialServiceProviderList, AppManager.getDeviceGeoPoint());
 
     }
 

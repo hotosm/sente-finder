@@ -20,27 +20,83 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:layout_marginStart="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_vertical_margin">
 
-        <TextView
+        <RelativeLayout
+            android:id="@+id/app_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:gravity="center_horizontal"
-            android:text="@string/app_info" />
+            android:layout_marginTop="?attr/actionBarSize"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/icons8_link"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:text="@string/app_info_text" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/osm_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/app_info">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:text="@string/osm_info_text" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/icons_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/osm_info"
+            android:layout_marginTop="@dimen/activity_horizontal_margin">
+
+            <TextView
+                android:id="@+id/icons_text_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/icon_info_text" />
+
+            <TextView
+                android:id="@+id/icons8_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/icon8"
+                android:layout_toEndOf="@+id/icons_text_info"
+                android:layout_toRightOf="@+id/icons_text_info"
+                android:textColor="@color/colorLink" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/developer_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/icon8"
-            android:textColor="@color/colorLink" />
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/developer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/developer_text" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

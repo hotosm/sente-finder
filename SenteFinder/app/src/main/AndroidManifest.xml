@@ -19,6 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar" >
+        <meta-data android:name="com.google.palces.api"
+            android:value="{$PLACES_API_KEY}"/>
         <activity
             android:name=".activities.SplashActivity"
             android:screenOrientation="portrait"
@@ -63,8 +65,8 @@
         <activity
             android:name=".activities.ReviewActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".activities.FinancialServiceProviderListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

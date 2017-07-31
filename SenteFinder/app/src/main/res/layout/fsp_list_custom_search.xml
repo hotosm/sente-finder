@@ -14,30 +14,28 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" >
 
-        <SearchView
+        <AutoCompleteTextView
             android:id="@+id/fsp_search"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:focusable="false"
-            android:theme="@style/AppTheme.SearchViewStyle"
+            android:paddingStart="20dp"
+            android:paddingLeft="20dp"
+            android:textColor="@color/colorGrey"
             android:background="@drawable/searchview_border"
-            android:queryHint="@string/search_fsps_hint"
-            android:searchIcon="@drawable/ic_search_dark"
-            android:queryBackground="@android:color/transparent"
-            android:iconifiedByDefault="false" />
+            android:textColorHint="@color/colorGrey"
+            android:hint="@string/search_fsps_hint" />
 
-        <SearchView
+        <AutoCompleteTextView
             android:id="@+id/city_search"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:focusable="false"
             android:layout_below="@+id/fsp_search"
-            android:theme="@style/AppTheme.SearchViewStyle"
+            android:paddingStart="20dp"
+            android:paddingLeft="20dp"
+            android:textColor="@color/colorGrey"
             android:background="@drawable/searchview_border"
-            android:queryHint="@string/search_cities_hint"
-            android:searchIcon="@drawable/ic_location_dark"
-            android:queryBackground="@android:color/transparent"
-            android:iconifiedByDefault="false" />
+            android:textColorHint="@color/colorGrey"
+            android:hint="@string/search_cities_hint" />
     </RelativeLayout>
 
     <ImageButton

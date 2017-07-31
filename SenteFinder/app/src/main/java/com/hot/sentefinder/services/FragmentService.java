@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.URLSpan;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,6 @@ import com.hot.sentefinder.utilities.URLSpanEdit;
 import com.hot.sentefinder.viewmodels.FinancialServiceProviderViewModel;
 
 import org.osmdroid.api.IMapView;
-import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -44,8 +44,8 @@ import java.util.List;
 
 public class FragmentService {
     private static long FSP_ID = 0;
-    private static final int FULL_VIEW_MAP_ZOOM = 15;
-    private static final int HALF_VIEW_MAP_ZOOM = 16;
+    private static final int FULL_VIEW_MAP_ZOOM = 17;
+    private static final int HALF_VIEW_MAP_ZOOM = 19;
     private Context context;
     private Activity activity;
     private List<OverlayItem> overlayItems = new ArrayList<>();
@@ -61,11 +61,11 @@ public class FragmentService {
         this.activity = activity;
     }
 
-    public void setUpMap(List<FinancialServiceProvider> financialServiceProviderList) {
-        setUpMap(financialServiceProviderList, true);
+    public void setUpMap(List<FinancialServiceProvider> financialServiceProviderList, GeoPoint mapCentreGeoPoint) {
+        setUpMap(financialServiceProviderList, mapCentreGeoPoint, true);
     }
 
-    public void setUpMap(List<FinancialServiceProvider> financialServiceProviderList, Boolean halfScreen) {
+    public void setUpMap(List<FinancialServiceProvider> financialServiceProviderList, GeoPoint mapCentreGeoPoint, Boolean halfScreen) {
         setUpViews();
         getDeviceLocation();
         mapController.setZoom(halfScreen ? HALF_VIEW_MAP_ZOOM : FULL_VIEW_MAP_ZOOM);
@@ -78,11 +78,11 @@ public class FragmentService {
         userMarker.setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
 
         //drawable for the fsps
-        fspMarker = ContextCompat.getDrawable(context, R.drawable.ic_action_location);
-        fspMarker.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
+        Drawable fspMarker1 = ContextCompat.getDrawable(context, R.drawable.location_marker);
+        fspMarker1.setColorFilter(ContextCompat.getColor(context, android.R.color.transparent), PorterDuff.Mode.SRC_ATOP);
 
         //set device location as center of map
-        mapController.setCenter(deviceGeoPoint);
+        mapController.setCenter(mapCentreGeoPoint);
 
         addDeviceLocationMarkerOnMap(deviceGeoPoint, userMarker);
 
@@ -91,7 +91,7 @@ public class FragmentService {
             List<Double> coordinates = provider.getCoordinates();
             double fspLatitude = coordinates.get(1);
             double fspLongitude = coordinates.get(0);
-            addFSPMarkerOnMap(new GeoPoint(fspLatitude, fspLongitude), fspMarker, provider.getId());
+            addFSPMarkerOnMap(new GeoPoint(fspLatitude, fspLongitude), fspMarker1, provider.getId());
         }
     }
 
@@ -134,21 +134,32 @@ public class FragmentService {
         int markerHeight = drawable.getIntrinsicHeight();
         drawable.setBounds(0, markerHeight, markerWidth, 0);
 
-        MapOverlayItem mapOverlayItem = new MapOverlayItem(drawable, geoPoint.getLatitude(), geoPoint.getLongitude(), fspId);
-        mapView.getOverlays().add(mapOverlayItem);
+        FSPOverlayItem FSPOverlayItem = new FSPOverlayItem(drawable, geoPoint.getLatitude(), geoPoint.getLongitude(), fspId);
+        mapView.getOverlays().add(FSPOverlayItem);
 
     }
 
+    public void setCentreOfMap(GeoPoint geoPoint){
+        mapController.setCenter(geoPoint);
+    }
+
+    public void deflateAllFspMarkers() {
+        fspMarker = ContextCompat.getDrawable(context, R.drawable.location_marker);
+
+        for (OverlayItem overlayItem : overlayItems) {
+            if (!overlayItem.getSnippet().isEmpty()) {
+                overlayItem.setMarker(fspMarker);
+            }
+        }
+    }
 
     public void inflateFspMarker(FinancialServiceProvider fsp) {
         OverlayItem item = getOverlayItem(fsp);
 
-        fspMarker = ContextCompat.getDrawable(context, R.drawable.ic_action_location);
-        fspMarker.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
+        Drawable fspMarker = item.getDrawable();
 
         Bitmap bitmap = ((BitmapDrawable) fspMarker).getBitmap();
-        Drawable scaledDrawable = new BitmapDrawable(activity.getResources(), Bitmap.createScaledBitmap(bitmap, 200, 200, true));
-        scaledDrawable.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
+        Drawable scaledDrawable = new BitmapDrawable(activity.getResources(), Bitmap.createScaledBitmap(bitmap, 170, 200, true));
         item.setMarker(scaledDrawable);
     }
 
@@ -280,17 +291,6 @@ public class FragmentService {
         });
     }
 
-    public void deflateAllFspMarkers() {
-        for (OverlayItem overlayItem : overlayItems) {
-            if (!overlayItem.getSnippet().isEmpty()) {
-                Bitmap bitmap = ((BitmapDrawable) fspMarker).getBitmap();
-                Drawable scaledDrawable = new BitmapDrawable(activity.getResources(), Bitmap.createScaledBitmap(bitmap, 90, 90, true));
-                scaledDrawable.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
-                overlayItem.setMarker(scaledDrawable);
-            }
-        }
-    }
-
     private void removeUnderlines(TextView textView) {
         Spannable s = new SpannableString(textView.getText());
         URLSpan[] spans = s.getSpans(0, s.length(), URLSpan.class);
@@ -315,13 +315,15 @@ public class FragmentService {
         return cachedFSPs;
     }
 
-    private class MapOverlayItem extends ItemizedOverlay<OverlayItem> {
+    private class FSPOverlayItem extends ItemizedOverlay<OverlayItem> {
         private OverlayItem overlayItem;
+        private Drawable drawable;
 
-        MapOverlayItem(Drawable drawable, double latitude, double longitude, long fspId) {
+        FSPOverlayItem(Drawable drawable, double latitude, double longitude, long fspId) {
             super(drawable);
 
             GeoPoint geoPoint = new GeoPoint(latitude, longitude);
+            this.drawable = drawable;
             overlayItem = new OverlayItem("", String.valueOf(fspId), geoPoint);
             overlayItems.add(overlayItem);
 
@@ -346,21 +348,19 @@ public class FragmentService {
         protected boolean onTap(int index) {
             setUpViews();
             OverlayItem item = overlayItems.get(index);
-            Bitmap bitmap = ((BitmapDrawable) fspMarker).getBitmap();
+            Log.d("TAPPED ITEM:", item.toString());
 
-            //check if fsp marker is clicked or device location marker
-            if (!item.getSnippet().isEmpty() && item.getSnippet() != null) {
-                FSP_ID = Long.parseLong(item.getSnippet());
-                FinancialServiceProvider fsp = AppManager.getFinancialServiceProviderById(FSP_ID);
-                toggleMapHeight(fsp);
-                updateTextViewsWithFSPDetails(fsp);
-                deflateAllFspMarkers();
-                inflateFspMarker(fsp);
-                GeoPoint geoPoint = new GeoPoint(fsp.getCoordinates().get(1), fsp.getCoordinates().get(0));
-                mapController.setCenter(geoPoint);
-                mapController.setZoom(HALF_VIEW_MAP_ZOOM);
-                mapController.animateTo(geoPoint);
-            }
+            FSP_ID = Long.parseLong(item.getSnippet());
+            FinancialServiceProvider fsp = AppManager.getFinancialServiceProviderById(FSP_ID);
+            toggleMapHeight(fsp);
+            updateTextViewsWithFSPDetails(fsp);
+            deflateAllFspMarkers();
+            inflateFspMarker(fsp);
+            GeoPoint geoPoint = new GeoPoint(fsp.getCoordinates().get(1), fsp.getCoordinates().get(0));
+            mapController.setCenter(geoPoint);
+            mapController.setZoom(HALF_VIEW_MAP_ZOOM);
+            mapController.animateTo(geoPoint);
+
             return true;
         }
 

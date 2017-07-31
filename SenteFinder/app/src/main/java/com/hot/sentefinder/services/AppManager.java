@@ -29,6 +29,7 @@ public class AppManager {
     public static List<FinancialServiceProvider> sendFinancialServiceProviderList = new ArrayList<>();
     public static List<FinancialServiceProvider> withdrawFinancialServiceProviderList = new ArrayList<>();
     public static List<FinancialServiceProvider> allFinancialServiceProviderList = new ArrayList<>();
+    public static List<FinancialServiceProvider> searchResults = new ArrayList<>();
     private static HashMap<String, GeoPoint> geoPointHashMap = new HashMap<>();
     public static final String DEVICE_GEO_POINT = "DeviceGeoPoint";
 
@@ -40,6 +41,12 @@ public class AppManager {
     public static GeoPoint getDeviceGeoPoint() {
         GeoPoint deviceGeoPoint = geoPointHashMap.get(DEVICE_GEO_POINT);
         return deviceGeoPoint;
+    }
+
+    private static double roundTo3dp(double value) {
+        DecimalFormat df = new DecimalFormat("#.###");
+        df.setRoundingMode(RoundingMode.CEILING);
+        return Double.valueOf(df.format(value));
     }
 
     public static String createSearchParameter() {
@@ -54,18 +61,8 @@ public class AppManager {
         return String.format("{ \"search\": \"\", \"lat\":\"%s\", \"long\":\"%s\", \"radius\":\"2000\" }", deviceLatitude, deviceLongitude);
     }
 
-    private static double roundTo3dp(double value) {
-        DecimalFormat df = new DecimalFormat("#.###");
-        df.setRoundingMode(RoundingMode.CEILING);
-        return Double.valueOf(df.format(value));
-    }
-
-    public static String createSearchParameter(String query) {
-        GeoPoint deviceGeoPoint = getDeviceGeoPoint();
-        double deviceLatitude = deviceGeoPoint.getLatitude();
-        double deviceLongitude = deviceGeoPoint.getLongitude();
-
-        return String.format("{ \"search\": \"%s\", \"lat\":\"%s\", \"long\":\"%s\", \"radius\":\"2000\" }", query, deviceLatitude, deviceLongitude);
+    public static String createSearchParameter(String query, GeoPoint geoPoint) {
+        return String.format("{ \"search\": \"%s\", \"lat\":\"%s\", \"long\":\"%s\", \"radius\":\"2000\" }", query, geoPoint.getLatitude(), geoPoint.getLongitude());
     }
 
     public static void createFinancialServiceProvidersList(String fragmentTag, List<FinancialServiceProvider> fspList) {
@@ -95,24 +92,26 @@ public class AppManager {
         }
     }
 
-    public static List<FinancialServiceProvider> getAllFinancialServiceProviderList() {
-        return allFinancialServiceProviderList;
+    public static FinancialServiceProvider getFinancialServiceProviderById(long id) {
+        HashMap<String, FinancialServiceProvider> hash = FinancialServiceProviderHashMap();
+        return hash.get(String.valueOf(id)) == null?searchResultsFSPHashMap().get(String.valueOf(id)) : hash.get(String.valueOf(id));
+
     }
 
-    public static FinancialServiceProvider getFSPById(String fragmentTag, long id) {
+    public static FinancialServiceProvider getFinancialServiceProviderById(String fragmentTag, long id) {
         FinancialServiceProvider fsp = new FinancialServiceProvider();
         switch (fragmentTag) {
             case TAG_BORROW_MONEY:
-                fsp = borrowFSPHashMap().get(String.valueOf(id));
+                fsp = borrowFSPHashMap().get(String.valueOf(id))==null ? searchResultsFSPHashMap().get(String.valueOf(id)) : borrowFSPHashMap().get(String.valueOf(id));
                 break;
             case TAG_SAVE_MONEY:
-                fsp = saveFSPHashMap().get(String.valueOf(id));
+                fsp = saveFSPHashMap().get(String.valueOf(id))==null ? searchResultsFSPHashMap().get(String.valueOf(id)) : saveFSPHashMap().get(String.valueOf(id));
                 break;
             case TAG_SEND_MONEY:
-                fsp = sendFSPHashMap().get(String.valueOf(id));
+                fsp = sendFSPHashMap().get(String.valueOf(id))==null ? searchResultsFSPHashMap().get(String.valueOf(id)) : sendFSPHashMap().get(String.valueOf(id));
                 break;
             case TAG_WITHDRAW_MONEY:
-                fsp = withdrawFSPHashMap().get(String.valueOf(id));
+                fsp = withdrawFSPHashMap().get(String.valueOf(id))==null ? searchResultsFSPHashMap().get(String.valueOf(id)) : withdrawFSPHashMap().get(String.valueOf(id));
                 break;
 
         }
@@ -151,10 +150,12 @@ public class AppManager {
         return hashMap;
     }
 
-    public static FinancialServiceProvider getFinancialServiceProviderById(long id) {
-        HashMap<String, FinancialServiceProvider> hash = FinancialServiceProviderHashMap();
-        return hash.get(String.valueOf(id));
-
+    private static HashMap<String, FinancialServiceProvider> searchResultsFSPHashMap() {
+        final HashMap<String, FinancialServiceProvider> hashMap = new HashMap<>();
+        for (FinancialServiceProvider fsp : searchResults) {
+            hashMap.put(String.valueOf(fsp.getId()), fsp);
+        }
+        return hashMap;
     }
 
     private static HashMap<String, FinancialServiceProvider> FinancialServiceProviderHashMap() {

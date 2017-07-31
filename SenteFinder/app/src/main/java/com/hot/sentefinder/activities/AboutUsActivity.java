@@ -23,6 +23,9 @@ public class AboutUsActivity extends AppCompatActivity {
         TextView linkView = (TextView) findViewById(R.id.icons8_link);
         linkView.setMovementMethod(LinkMovementMethod.getInstance());
 
+        TextView developerLinkView = (TextView) findViewById(R.id.developer_text);
+        developerLinkView.setMovementMethod(LinkMovementMethod.getInstance());
+
     }
 
     @Override

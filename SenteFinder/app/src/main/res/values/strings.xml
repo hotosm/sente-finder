@@ -30,15 +30,21 @@
     <string name="review_question">How accurate was the information on this financial service provider?</string>
     <string name="comments">Comments</string>
     <string name="review_submit">submit review</string>
+    <string name="review_more_information">If you would like to give some more feedback with regards to the accuracy of this information, please click this <a href="#">link</a></string>
 
     <!--about us activity-->
     <string name="title_activity_about">About Us</string>
-    <string name="app_info">The icons in this app are from</string>
+    <string name="app_info_text">SenteFinder focuses on providing financial service information to consumers, enabling them to compare the suitability of the services offered to them by various financial service providers, based on their specific needs. Services considered are borrowing, saving, sending and withdrawing money. </string>
+    <string name="osm_info_text">SenteFinder is using data from OpenStreetMap(OSM)</string>
+
+    <string name="icon_info_text">The icons in this app are from" "</string>
     <string name="icon8"><a href="http://icons8.com">ICONS8</a></string>
+    <string name="developer_text">"\u00a9" Developed by <a href="http://laboremus.ug">Laboremus Uganda Ltd</a></string>
 
     <!--search activity-->
     <string name="search_cities_hint">Search cities…</string>
     <string name="search_fsps_hint">Search service providers…</string>
+    <string name="default_city">Nearby</string>
 
     <!-- Toolbar titles when navigation menu item is selected -->
     <string-array name="nav_item_activity_titles">
@@ -53,6 +59,7 @@
     <string name="application_preference">com.hot.sentefinder</string>
     <string name="first_load">first load</string>
     <string name="baseReview">…</string>
+
     <string-array name="fsp_review_meanings_array">
         <item>Very Inaccurate</item>
         <item>Inaccurate</item>

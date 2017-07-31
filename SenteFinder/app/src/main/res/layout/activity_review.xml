@@ -112,6 +112,21 @@
                 android:textColor="@color/colorWhite" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/fsp_more_information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:id="@+id/fsp_more_information_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/review_more_information" />
+        </RelativeLayout>
+
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
